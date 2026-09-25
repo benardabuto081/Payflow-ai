@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const repaymentsRouter = require('./routes/repayments');
+const loanAccountsRouter = require('./routes/loanAccounts');
+const customersRouter = require('./routes/customers');
 
 const app = express();
 app.use(express.json());
@@ -13,6 +15,8 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/repayments', repaymentsRouter);
+app.use('/loan-accounts', loanAccountsRouter);
+app.use('/customers', customersRouter);
 
 app.listen(PORT, () => {
   console.log(`PayFlow AI backend listening on port ${PORT}`);

@@ -1,5 +1,6 @@
 const express = require('express');
 const { processRepayment } = require('../services/repaymentService');
+const { getRepaymentTransactionById } = require('../models/repaymentTransaction');
 
 const router = express.Router();
 
@@ -27,6 +28,21 @@ router.post('/', async (req, res) => {
   } catch (err) {
     console.error('Unexpected error processing repayment:', err);
     return res.status(500).json({ outcome: 'ERROR', reason: 'Internal server error.' });
+  }
+});
+
+router.get('/:id', async (req, res) => {
+  try {
+    const transaction = await getRepaymentTransactionById(req.params.id);
+
+    if (!transaction) {
+      return res.status(404).json({ reason: 'No repayment transaction found with this ID.' });
+    }
+
+    return res.status(200).json(transaction);
+  } catch (err) {
+    console.error('Unexpected error retrieving repayment:', err);
+    return res.status(500).json({ reason: 'Internal server error.' });
   }
 });
 
