@@ -1,0 +1,72 @@
+openapi: 3.0.3
+info:
+  title: PayFlow AI Repayment API
+  description: Deterministic loan repayment processing API for PayFlow AI.
+  version: 1.0.0
+servers:
+  - url: https://cattle-spokesman-humbly.ngrok-free.dev
+paths:
+  /repayments:
+    post:
+      operationId: submitRepayment
+      summary: Submit a loan repayment
+      description: Validates and processes a loan repayment request. Returns COMPLETED, REJECTED, or FAILED depending on validation and mock payment provider outcome.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [accountId, amount, channel]
+              properties:
+                accountId:
+                  type: string
+                  format: uuid
+                  description: The loan account ID to repay.
+                amount:
+                  type: number
+                  description: The repayment amount.
+                channel:
+                  type: string
+                  enum: [mpesa, bank, ussd]
+                  description: The payment channel used.
+      responses:
+        '201':
+          description: Repayment completed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Repayment rejected due to invalid request.
+          content:
+            application/json:
+              schema:
+                type: object
+        '422':
+          description: Repayment failed at the payment provider.
+          content:
+            application/json:
+              schema:
+                type: object
+  /repayments/{id}:
+    get:
+      operationId: getRepayment
+      summary: Retrieve a repayment transaction by ID
+      description: Fetches the stored details and outcome of a previously submitted repayment transaction.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Transaction found.
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: No transaction found with this ID.
