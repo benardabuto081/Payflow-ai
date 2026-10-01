@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const path = require('path');
 const repaymentsRouter = require('./routes/repayments');
 const loanAccountsRouter = require('./routes/loanAccounts');
 const customersRouter = require('./routes/customers');
@@ -19,6 +20,9 @@ app.use('/repayments', repaymentsRouter);
 app.use('/loan-accounts', loanAccountsRouter);
 app.use('/customers', customersRouter);
 app.use('/ai', aiRouter);
+
+// Serve the frontend
+app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
 app.listen(PORT, () => {
   console.log(`PayFlow AI backend listening on port ${PORT}`);

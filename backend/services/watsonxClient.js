@@ -30,11 +30,11 @@ async function getAccessToken() {
   return cachedToken;
 }
 
-async function generateText(prompt, { modelId = 'ibm/granite-4-h-small', maxNewTokens = 200 } = {}) {
+async function generateText(prompt, { modelId = 'ibm/granite-4-h-small', maxTokens = 200 } = {}) {
   const token = await getAccessToken();
 
   const response = await fetch(
-    `${process.env.WATSONX_URL}/ml/v1/text/generation?version=2024-05-31`,
+    `${process.env.WATSONX_URL}/ml/v1/text/chat?version=2024-05-31`,
     {
       method: 'POST',
       headers: {
@@ -43,12 +43,11 @@ async function generateText(prompt, { modelId = 'ibm/granite-4-h-small', maxNewT
       },
       body: JSON.stringify({
         model_id: modelId,
-        project_id: process.env.WATSONX_PROJECT_ID,
-        input: prompt,
-        parameters: {
-          max_new_tokens: maxNewTokens,
-          decoding_method: 'greedy',
-        },
+        space_id: process.env.WATSONX_SPACE_ID,
+        messages: [
+          { role: 'user', content: prompt },
+        ],
+        max_tokens: maxTokens,
       }),
     }
   );
@@ -59,7 +58,7 @@ async function generateText(prompt, { modelId = 'ibm/granite-4-h-small', maxNewT
   }
 
   const data = await response.json();
-  return data.results?.[0]?.generated_text?.trim() || '';
+  return data.choices?.[0]?.message?.content?.trim() || '';
 }
 
 module.exports = { generateText };
